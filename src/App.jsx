@@ -61,6 +61,17 @@ function App() {
     return null // if no winner
   }
 
+  const resetGame = () => {
+    setBoard(Array(9).fill(null))
+    setTurn(TURNS.X)
+    setWinner(null)
+  }
+
+  const checkEndGame = (newBoard) => {
+
+    return newBoard.every((square) => square != null)
+  }
+
 
   const updateBoard = (index) => {
     if (board[index] || winner) return // This returns if board[index] already exists
@@ -75,34 +86,61 @@ function App() {
     //check if winner
     const newWinner = checkWinner(newBoard)
     if (newWinner) {
-      alert(`${newWinner} won the game`)
       setWinner(newWinner)
+    } else if (checkEndGame(newBoard)) {
+      setWinner(false) // Tie game
     }
+
   }
 
   return (
-    <main className='board'>
-      <h1>Tic Tac Toe</h1>
-      <section className='game'>
+    <>
+      <main className='board'>
+        <h1>Tic Tac Toe</h1>
+        <section className='game'>
+          {
+            board.map((_, index) => {
+              return (
+                <Square key={index} index={index} updateBoard={updateBoard}>
+                  {board[index]}
+                </Square>
+              )
+            })
+          }
+        </section>
+
+        <section className='turn'>
+          <Square isSelected={turn === TURNS.X}>
+            {TURNS.X}
+          </Square>
+          <Square isSelected={turn === TURNS.O}>
+            {TURNS.O}
+          </Square>
+        </section>
         {
-          board.map((_, index) => {
-            return (
-              <Square key={index} index={index} updateBoard={updateBoard}>
-                {board[index]}
-              </Square>
-            )
-          })
+          winner != null && (
+            <section className="winner">
+              <div className='text'>
+                <h2>
+                  {
+                    winner === false
+                      ? 'Tie'
+                      : `Win:`
+                  }
+                </h2>
+                <header className='win'>
+                  {winner && <Square> {winner} </Square>}
+                </header>
+                <footer>
+                  <button onClick={resetGame}>Try again</button>
+                </footer>
+              </div>
+            </section>
+          )
         }
-      </section>
-      <section className='turn'>
-        <Square isSelected={turn === TURNS.X}>
-          {TURNS.X}
-        </Square>
-        <Square isSelected={turn === TURNS.O}>
-          {TURNS.O}
-        </Square>
-      </section>
-    </main>
+        <button onClick={resetGame}>Reset Game</button>
+      </main>
+    </>
   )
 }
 
